@@ -1,0 +1,21 @@
+
+escritor_task:
+  description: >
+    desenvolver um texto para uma publicação no linkedin sobre o assunto {topico}
+    lembre-se de mencionar os seguintes pontos que são extremamente importantes para deixa a mensagem clara
+    {observacoes}. Lembre-se de valorizar o post que está fazendo.
+    Use bullet points para mostrar os beneficios que seu post almeja
+  expected_output: >
+    um texto em portugues com uma estrutura relevante e não mais de 4 parágrafos para postar no linkedin
+  agent: escritor
+
+revisor_task:
+  description: >
+    A partir do texto recebido você deve verificar se o texto possui algum erro gramatical, ou se possui pontos de melhoria.
+    caso sim voce deve corrigir e retornar o novo texto melhorado
+  expected_output: >
+    Um texto em portugues Brasil, sem erros gramaticais e com vocabulario que se encaixa com aquele presente no Linkedin.
+    Voce nao deve retornar os erros encontrados, apenas o texto formatado para postar
+  agent: revisor
+  context:
+    - escritor_task
