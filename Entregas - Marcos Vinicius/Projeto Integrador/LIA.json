@@ -1,0 +1,234 @@
+{
+  "name": "LIA",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lia_proj",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "ce1cdb69-2955-46ac-a244-8081cd83e598",
+      "name": "Webhook",
+      "webhookId": "384aaad2-7373-46b8-8c92-a692045fabc2",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Você é um assistente inteligente especializado em entender descrições faladas de compras pessoais.\n\nSua tarefa é analisar um texto falado em linguagem natural, onde uma pessoa descreve uma compra que fez (exemplo: “comprei um sapato por 150 reais”).\n\nA partir desse texto, extraia e organize as seguintes informações:\n\n1. **Produto**: o nome do item ou serviço comprado. Seja especifico com o que vc identificar\n2. **Valor**: o valor pago (em reais), mesmo que esteja escrito por extenso ou com variação na forma (ex: \"cento e cinquenta\", \"R$ 150,00\", etc).\n3. **Categoria**: classifique o produto com base em regras pré-definidas abaixo.\n\n### Regras para a categoria:\n- Se for um imposto (ex: IPVA, IPTU, IR), classifique como: **\"Imposto\"**.\n- Se for algo de uso pessoal (ex: roupas, cosméticos, eletrônicos, sapatos, etc.), classifique como: **\"Pessoal\"**.\n- Se for alimentação (Fast foods, restaurantes, delivery, almoço etc.), classifique como: **\"Alimentação\"**.\n- Se for algo relacionado a moradia (aluguel, conta de luz, água, internet, supermercado), classifique como: **\"Moradia\"**.\n- Se for relacionado a transporte (combustível, passagem, pedágio, avião, onibus etc.), classifique como: **\"Transporte\"**.\n- Se for remédio ou consulta médica, classifique como: **\"Saúde\"**.\n- Se for relacionado a contextos de lazer (saída, balada, bar, parque de diversões, jogos de videogame, skins de armas, saída com a namorada) classifique como **Lazer**\n- Se for relacionado contextos de estudos como (eventos em geral, cursos, certificações) classifique como **estudos**\n- Se for relacionado a investimentos como criptomoedas, ativos financeiros (fundos imobiliarios, ETF) classifique como **investimento*\n- Se não for possível identificar, use: **\"Outros\"**.\n\n### Formato da resposta:\nRetorne sempre e APENAS o formato JSON, não retorne nada diferente disso como algum texto ou algo parecido, apenas o json\n\n\n\n  \"produto\": \"<produto extraído>\",\n  \"valor\": \"<valor em reais>\",\n  \"categoria\": \"<categoria classificada>\"\n\nAqui está o texto:\n{{ $json.body.texto }}\n ",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "aa9d78ce-7af4-43f6-a9f2-444842f28f87",
+      "name": "AI Agent",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "respondWith": "allIncomingItems",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        780,
+        0
+      ],
+      "id": "9e5a54c6-b419-4a76-bd38-611dacb9c06d",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"produto\": \"2 tenis\",\n  \"valor\": 320,\n  \"categoria\": \"Imposto\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        420,
+        160
+      ],
+      "id": "bbddf82c-87bf-4bd1-a4f9-c1521d33500e",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4o-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        160
+      ],
+      "id": "5cea10c8-d5c9-4049-9e4d-eab1b314100a",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "lOmF9nXnWKoqRfmk",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1yjZZpKVVpITdmLC_n-SnH-G9Zxg8OJYxmfC3_xBVIqE",
+          "mode": "list",
+          "cachedResultName": "LIA - Controle financeiro",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yjZZpKVVpITdmLC_n-SnH-G9Zxg8OJYxmfC3_xBVIqE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Controle financeiro",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1yjZZpKVVpITdmLC_n-SnH-G9Zxg8OJYxmfC3_xBVIqE/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Compra": "={{ $json.output.produto }}",
+            "Categoria": "={{ $json.output.categoria }}",
+            "Valor": "={{ $json.output.valor }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Compra",
+              "displayName": "Compra",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Categoria",
+              "displayName": "Categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Valor",
+              "displayName": "Valor",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        580,
+        0
+      ],
+      "id": "c6321b7a-b594-4925-b891-125b91815d75",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ZSp8CHdQina4jAQk",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2db4eb9b-8677-4a1d-9d06-7c1631654b31",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "558d88703fb65b2d0e44613bc35916258b0f0bf983c5d4730c00c424b77ca36a"
+  },
+  "id": "LND6wuFqnEZmxf9z",
+  "tags": []
+}
