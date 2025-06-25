@@ -1,0 +1,34 @@
+analyze_spending_task:
+  description: >
+    Analise o JSON de entrada que contém os registros de gastos financeiros.
+    Identifique:
+    - Categorias com maior percentual de gastos.
+    - Principais padrões de despesas mensais.
+    - Gastos supérfluos ou que podem ser reduzidos.
+
+    Dados de entrada:
+    {lista}
+
+  expected_output: >
+    Um relatório analítico em formato de texto com:
+    - Lista das principais categorias de gastos.
+    - Percentual de gasto por categoria.
+    - Principais observações sobre o padrão de consumo.
+    - Alertas sobre gastos excessivos.
+  agent: financial_analyst
+
+recommend_saving_plan_task:
+  description: >
+    Com base na análise detalhada fornecida pelo Analista Financeiro, crie um plano de economia.
+    Considere:
+    - Áreas de possível corte de gastos.
+    - Sugestões de mudança de hábito financeiro.
+    - Dicas práticas e realistas de economia.
+    {lista}
+
+  expected_output: >
+    Um plano de economia com:
+    - Pelo menos 5 sugestões práticas para reduzir despesas.
+    - Estimativa percentual de economia para cada sugestão.
+    - Tom de comunicação amigável e acessível para o leitor.
+  agent: cost_optimizer
